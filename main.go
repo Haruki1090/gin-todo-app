@@ -71,7 +71,6 @@ func main() {
 	})
 
 	// タスクを削除するエンドポイント（DELETE）
-	// タスクを削除するエンドポイント（DELETE）
 	r.DELETE("/tasks/:id", func(ctx *gin.Context) {
 		// パスパラメータからIDを取得
 		id := ctx.Param("id")
