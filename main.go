@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
 
 // タスク情報を表す構造体
 type Task struct {
@@ -30,6 +34,40 @@ func main() {
 		newTask.ID = len(tasks) + 1
 		tasks = append(tasks, newTask)
 		ctx.JSON(201, newTask)
+	})
+
+	// タスクを更新するエンドポイント（PUT）
+	r.PUT("/tasks/:id", func(ctx *gin.Context) {
+		// idを文字列→数値に変換
+		id := ctx.Param("id")
+		taskID, err := strconv.Atoi(id)
+
+		// IDが数値でない場合
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		var updateTask Task // 更新するタスク
+
+		// リクエストボディをJSONにバインド
+		if err := ctx.ShouldBindJSON(&updateTask); err != nil {
+			ctx.JSON(400, gin.H{"error": "Invaild JSON"})
+			return
+		}
+
+		// 該当するタスクを検索して更新
+		for i, t := range tasks {
+			if t.ID == taskID {
+				tasks[i] = updateTask
+				ctx.JSON(200, tasks[i])
+				return
+			}
+		}
+
+		// 該当するタスクが見つからない場合
+		ctx.JSON(404, gin.H{"error": "Task not found"})
+
 	})
 
 	// サーバー
