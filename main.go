@@ -71,25 +71,36 @@ func main() {
 	})
 
 	// タスクを削除するエンドポイント（DELETE）
+	// タスクを削除するエンドポイント（DELETE）
 	r.DELETE("/tasks/:id", func(ctx *gin.Context) {
+		// パスパラメータからIDを取得
 		id := ctx.Param("id")
 		taskID, err := strconv.Atoi(id)
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": "Invaild ID"})
+			ctx.JSON(400, gin.H{"error": "Invalid ID"})
 			return
 		}
 
 		// 該当するタスクを検索して削除
-		for i, t := range tasks {
+		found := false
+		newTasks := []Task{} // 削除後のタスクリストを作成
+		for _, t := range tasks {
 			if t.ID == taskID {
-				tasks = append(tasks[:i], tasks[i+1:]...)
-				ctx.JSON(204, nil)
-				return
+				found = true // 該当タスクが見つかった
+				continue     // 削除するタスクはスキップ
 			}
+			newTasks = append(newTasks, t) // 他のタスクは新しいリストに追加
 		}
 
-		// 該当するタスクが見つからない場合
-		ctx.JSON(404, gin.H{"error": "Task not found"})
+		if !found {
+			// 該当するタスクが見つからない場合
+			ctx.JSON(404, gin.H{"error": "Task not found"})
+			return
+		}
+
+		// タスクリストを更新
+		tasks = newTasks
+		ctx.JSON(204, nil) // 成功（204 No Content）
 	})
 
 	// サーバー
