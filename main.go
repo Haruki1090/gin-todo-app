@@ -70,6 +70,28 @@ func main() {
 
 	})
 
+	// タスクを削除するエンドポイント（DELETE）
+	r.DELETE("/tasks/:id", func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		taskID, err := strconv.Atoi(id)
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "Invaild ID"})
+			return
+		}
+
+		// 該当するタスクを検索して削除
+		for i, t := range tasks {
+			if t.ID == taskID {
+				tasks = append(tasks[:i], tasks[i+1:]...)
+				ctx.JSON(204, nil)
+				return
+			}
+		}
+
+		// 該当するタスクが見つからない場合
+		ctx.JSON(404, gin.H{"error": "Task not found"})
+	})
+
 	// サーバー
 	r.Run(":8080")
 }
