@@ -20,6 +20,18 @@ func main() {
 		ctx.JSON(200, tasks)
 	})
 
+	// タスクを追加するエンドポイント（POST）
+	r.POST("/tasks", func(ctx *gin.Context) {
+		var newTask Task
+		if err := ctx.ShouldBindJSON(&newTask); err != nil {
+			ctx.JSON(400, gin.H{"error": "Invalid JSON"})
+			return
+		}
+		newTask.ID = len(tasks) + 1
+		tasks = append(tasks, newTask)
+		ctx.JSON(201, newTask)
+	})
+
 	// サーバー
 	r.Run(":8080")
 }
