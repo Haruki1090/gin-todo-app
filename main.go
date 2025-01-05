@@ -19,4 +19,7 @@ func main() {
 	r.GET("/tasks", func(ctx *gin.Context) {
 		ctx.JSON(200, tasks)
 	})
+
+	// サーバー
+	r.Run()
 }
